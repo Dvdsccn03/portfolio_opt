@@ -25,7 +25,7 @@ col_i, col_t, col_z = st.columns([3.5, 0.5, 1.5])
 with col_i:
     st.header('Portfolio optimization tool')
 with col_t:
-    st.image("C:\\Users\\sacco\\Desktop\\Python\\Bocconi\\Starting Finance\\Early analysis\\report.jpg", width=80)
+    st.image("report.jpg", width=80)
 with col_z:
     st.markdown("""Created by 
     <a href="https://www.linkedin.com/company/starting-finance-club-bocconi/posts/?feedView=all" target="_blank">
