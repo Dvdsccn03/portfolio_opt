@@ -24,22 +24,14 @@ st.set_page_config(layout="wide")
 col_i, col_t, col_z = st.columns([3.5, 0.5, 1.5])
 with col_i:
     st.header('Portfolio optimization tool')
-with col_t:
-    st.image("report.jpg", width=80)
 with col_z:
-    st.markdown("""Created by 
-    <a href="https://www.linkedin.com/company/starting-finance-club-bocconi/posts/?feedView=all" target="_blank">
-        <button style="background-color: #262730; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;">
-            Starting Finance Club Bocconi
-        </button>
-    </a>
-    """, unsafe_allow_html=True)
+    st.markdown("Created by: Davide, Tom, Maxime")
 
 # Sidebar: User Inputs
 st.sidebar.header("Portfolio Optimization Settings")
 uploaded_file = st.sidebar.file_uploader("Upload Returns Data", type=["xlsx", "xls"])
 frequency = st.sidebar.selectbox("Frequency", ["Daily", "Monthly"])
-rf_annual = st.sidebar.number_input("Annual Risk-Free Rate (%)", min_value=0.0, value=2.00, max_value=100.0, step=0.01, format="%.2f") / 100
+rf_annual = st.sidebar.number_input("Annual Risk-Free Rate", min_value=0.0, value=2.00, max_value=10.0, step=0.01, format="%.2f") / 100
 long_only = st.sidebar.selectbox("Long Only?", ["No", "Yes"])
 vol_cap_enabled = st.sidebar.selectbox("Volatility Cap?", ["No", "Yes"])
 
@@ -116,13 +108,13 @@ if uploaded_file is not None:
 
     # Optimization for max Sharpe (Optimal/Tangency Portfolio)
     if long_only == "Yes" and volatility_cap is not None:
-        opt_result = minimize(neg_sharpe_ratio, x0, args=(mu, sigma_matrix, rf_annual), constraints=[constraint1, constraint2, constraint3])
+        opt_result = minimize(neg_sharpe_ratio, x0, args=(mu, sigma_matrix, rf_annual), constraints=[constraint1, constraint2, constraint3], options=dict(ftol=1e-8))
     elif long_only == "Yes":
-        opt_result = minimize(neg_sharpe_ratio, x0, args=(mu, sigma_matrix, rf_annual), constraints=[constraint1, constraint2])
+        opt_result = minimize(neg_sharpe_ratio, x0, args=(mu, sigma_matrix, rf_annual), constraints=[constraint1, constraint2], options=dict(ftol=1e-8))
     elif volatility_cap is not None:
-        opt_result = minimize(neg_sharpe_ratio, x0, args=(mu, sigma_matrix, rf_annual), constraints=[constraint1, constraint3])
+        opt_result = minimize(neg_sharpe_ratio, x0, args=(mu, sigma_matrix, rf_annual), constraints=[constraint1, constraint3], options=dict(ftol=1e-8))
     else:
-        opt_result = minimize(neg_sharpe_ratio, x0, args=(mu, sigma_matrix, rf_annual), constraints=[constraint1])
+        opt_result = minimize(neg_sharpe_ratio, x0, args=(mu, sigma_matrix, rf_annual), constraints=[constraint1], options=dict(ftol=1e-8))
 
     optimal_weights = opt_result.x
     portfolio_return = np.dot(optimal_weights, mu)  # annualized return
@@ -131,9 +123,9 @@ if uploaded_file is not None:
 
     # Optimization for Minimum Variance Portfolio
     if long_only == "Yes":
-        min_var_result = minimize(portfolio_variance, x0, args=(sigma_matrix,), constraints=[constraint1, constraint2])
+        min_var_result = minimize(portfolio_variance, x0, args=(sigma_matrix,), constraints=[constraint1, constraint2], options=dict(ftol=1e-8))
     else:
-        min_var_result = minimize(portfolio_variance, x0, args=(sigma_matrix,), constraints=[constraint1])
+        min_var_result = minimize(portfolio_variance, x0, args=(sigma_matrix,), constraints=[constraint1], options=dict(ftol=1e-8))
 
     min_var_weights = min_var_result.x
     min_var_return = np.dot(min_var_weights, mu)
@@ -175,7 +167,8 @@ if uploaded_file is not None:
             "Optimal Portfolio": optimal_weights.round(4),
             "Minimum Variance Portfolio": min_var_weights.round(4)
         }, index=asset_names)
-        st.dataframe(portfolio_weights_df)
+        st.dataframe(portfolio_weights_df.style
+                     .format("{:.2%}"))
 
     with col2:
         portfolio_summary = pd.DataFrame({
