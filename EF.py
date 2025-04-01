@@ -20,12 +20,15 @@ def compute_var_es(returns, alpha=0.95):
 
 
 # Title
-st.set_page_config(layout="wide")
-col_i, col_t, col_z = st.columns([3.5, 0.5, 1.5])
-with col_i:
-    st.header('Portfolio optimization tool')
-with col_z:
-    st.markdown("Created by: Davide, Tom, Maxime")
+col_i, col_t = st.columns([3,1])
+with col_i: st.header('Portfolio Optimization Tool')
+with col_t: st.markdown("""Created by 
+    <a href="https://www.linkedin.com/in/davide-saccone/" target="_blank">
+        <button style="background-color: #262730; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;">
+            Davide Saccone
+        </button>
+    </a>
+    """, unsafe_allow_html=True)
 
 # Sidebar: User Inputs
 st.sidebar.header("Portfolio Optimization Settings")
